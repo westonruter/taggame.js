@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html class="no-js">
+    <head>
+        <meta charset=utf-8>
+        <title>Tag! You're it!</title>
+        <link rel=stylesheet href="/style.css">
+        <script>document.documentElement.classList.remove('no-js')</script>
+    </head>
+    <body>
+        <h1>Tag! You're it!</h1>
+        
+        <noscript><p style="color:red">OOPS! You need JavaScript enabled to play. Be cool!</p></noscript>
+        
+        <div class="loading">
+            <p>Please wait… loading</p>
+        </div>
+        
+        <div class="game" hidden>
+            <form class="join" action="javascript:">
+                <p>
+                    <label for="name">Enter your name to join: </label>
+                    <input type="text" id="name" name="name" autofocus required><button type=submit>Join!</button>
+                </p>
+                <p class="robohash" hidden>
+                    <img><br>
+                    <em>This is you! Thanks <a href="http://robohash.org/" target="_blank">RoboHash</a>!</em>
+                </p>
+            </form>
+            
+            <div class="field"></div>
+            <ul class="players"></ul>
+        </div>
+        
+        <footer>
+            <address>
+                <a href="https://plus.google.com/113853198722136596993" rel="me author">Weston Ruter</a>
+                (<a href="https://twitter.com/westonruter">@westonruter</a>),
+                <a href="http://x-team.com/">X-Team</a>
+            </address>
+        </footer>
+        
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+        <script src="/client.js"></script>
+    </body>
+</html>
