@@ -24,6 +24,7 @@ h1 {
 	left: 40px;
 	right: 40px;
 	top: 40px;
+	z-index: 10;
 }
 .join,
 .join a {
@@ -52,6 +53,10 @@ h1 {
 	box-shadow: 0 0 3px black;
 	-webkit-box-shadow: 0 0 10px black;
 	background: white;
+	position: relative;
+}
+.field img {
+	position: absolute;
 }
 
 footer {
