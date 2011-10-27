@@ -103,6 +103,28 @@ var Game = {
         this.socket.on('playerJoin', function(player){
             
         });
+        
+        var $field = $('.field');
+        $field.mousemove(function(e){
+            
+            if(Game.myPlayerId){
+                var speed = 0;
+                var direction = 0;
+                
+                var $img = $(Game.playerElements[Game.myPlayerId]);
+                var x = e.layerX - $img.width()/2;
+                var y = e.layerY - $img.height()/2;
+                
+                // @todo This needs to not be set here, but rather in a socket from the server with the value from there
+                $img.css({
+                    top: y,
+                    left: x
+                });
+                
+            }
+            
+        })
+        
     },
     
     renderPlayers: function(){

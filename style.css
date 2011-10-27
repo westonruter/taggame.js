@@ -54,9 +54,18 @@ h1 {
 	-webkit-box-shadow: 0 0 10px black;
 	background: white;
 	position: relative;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	user-select: none;
 }
 .field img {
 	position: absolute;
+	/*-moz-transition: top 100ms, left 100ms;*/
+	/*-webkit-transition: top 100ms, left 100ms;*/
+	-webkit-user-drag: none;
+	-moz-user-drag: none;
+	user-drag: none;
+	pointer-events: none;
 }
 
 footer {
