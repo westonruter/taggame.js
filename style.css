@@ -24,7 +24,7 @@ h1 {
 	left: 40px;
 	right: 40px;
 	top: 40px;
-	z-index: 10;
+	z-index: 10000;
 }
 .join,
 .join a {
@@ -66,6 +66,9 @@ h1 {
 	-moz-user-drag: none;
 	user-drag: none;
 	pointer-events: none;
+}
+.field img.me {
+	z-index: 1000;
 }
 
 footer {

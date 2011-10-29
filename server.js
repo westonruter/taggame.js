@@ -22,6 +22,7 @@ function Player(params){
         height: 100, //px
         radius: 50, //px
         isIt: false,
+        isSelf: false,
         x: Math.round(BOARD_WIDTH_PX  * Math.random()),
         y: Math.round(BOARD_HEIGHT_PX * Math.random()),
         direction: 0.0, // rad or deg?
@@ -33,9 +34,13 @@ function Player(params){
     shasum.update(ID_SALT + this.sessionId + this.name);
     this.id = shasum.digest('hex');
 }
-Player.prototype.cloneForClient = function(){
+Player.prototype.cloneForClient = function(socket){
     var player = _(this).clone();
+    if(socket){
+        player.isSelf = (socket.id === player.sessionId);
+    }
     delete player.sessionId;
+    delete player.socket;
     return player;
 };
 
@@ -87,23 +92,17 @@ var PlayerRegistry = _.extend([], {
         _(this).each(function(player){
             // @todo Gotta do some trig here! Calculate each player's x & y based on their velocities and the amount of time transpired
         });
-        
-        //this.broadcast();
     },
     
-    cloneAllForClient: function(){
+    cloneAllForClient: function(socket){
         // We remove the id from the players returned to the client to avoid cheating, by clients making fraudulent requests 
         var players = [];
         _(this).each(function(player){
-            players.push(player.cloneForClient());
+            players.push(player.cloneForClient(socket));
         });
         return players;
     }
 });
-
-setInterval(function(){
-    PlayerRegistry.updatePositions();
-}, POSITION_UPDATE_INTERVAL_MS);
 
 
 /**
@@ -147,7 +146,7 @@ function handler (req, res) {
  * Game events
  */
 io.sockets.on('connection', function (socket) {
-    io.sockets.emit('playersUpdate', PlayerRegistry.cloneAllForClient());
+    io.sockets.emit('playersUpdate', PlayerRegistry.cloneAllForClient(socket));
     
     socket.on('playerJoinRequest', function (params) {
         if(typeof params.name === 'undefined'){
@@ -159,31 +158,22 @@ io.sockets.on('connection', function (socket) {
         else {
             var player = PlayerRegistry.add({
                 sessionId: socket.id,
+                socket: socket,
                 joined: new Date(),
                 name: params.name
             });
-            
-            //var clientPlayer = player.cloneForClient();
-            socket.emit('playerJoinSuccess', player.id);
-            io.sockets.emit('playersUpdate', PlayerRegistry.cloneAllForClient());
-            
-            // io.sockets.emit('playerJoin', clientPlayer);
+            socket.emit('playerJoinSuccess');
+            io.sockets.emit('playerJoin', player.cloneForClient());
+            broadcastPlayersUpdate();
         }
     });
     
-    socket.on('playerMove', function(velocity){
+    socket.on('playerMove', function(){
         var player = PlayerRegistry.getBy('sessionId', socket.id);
         if(!player){
            return;
         }
-        player.speed = parseFloat(velocity.speed);
-        if(player.speed > PLAYER_MAX_SPEED){
-            player.speed = PLAYER_MAX_SPEED;
-        }
-        player.direction = parseFloat(velocity.direction);
-        
-        console.log('playerMove', velocity)
-        PlayerRegistry.updatePositions();
+        // @todo
     });
     
     socket.on('disconnect', function(){
@@ -193,7 +183,12 @@ io.sockets.on('connection', function (socket) {
         }
         PlayerRegistry.remove(player);
         io.sockets.emit('playerLeave', player.cloneForClient());
-        io.sockets.emit('playersUpdate', PlayerRegistry.cloneAllForClient());
+        broadcastPlayersUpdate();
     });
 });
 
+function broadcastPlayersUpdate(){
+    _(PlayerRegistry).each(function(player){
+        player.socket.emit('playersUpdate', PlayerRegistry.cloneAllForClient(player.socket));
+    });
+}

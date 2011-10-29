@@ -63,9 +63,7 @@ var Game = {
             that.socket.emit('playerJoinRequest', {name: $name.val()});
         });
         
-        this.socket.on('playerJoinSuccess', function(id){
-            Game.myPlayerId = id;
-            
+        this.socket.on('playerJoinSuccess', function(){
             // Get rid of the form
             $form.animate(
                 {
@@ -108,24 +106,22 @@ var Game = {
         });
         
         var $field = $('.field');
+        var $me;
         $field.mousemove(function(e){
-            
-            if(Game.myPlayerId){
-                var speed = 0;
-                var direction = 0;
-                
-                var $img = $(Game.playerElements[Game.myPlayerId]);
-                var x = e.layerX - $img.width()/2;
-                var y = e.layerY - $img.height()/2;
-                
-                // @todo This needs to not be set here, but rather in a socket from the server with the value from there
-                $img.css({
-                    top: y,
-                    left: x
-                });
-                
+            if(!$me || !$me.length){
+                $me = $field.find('.me');
+                if($me.length == 0){
+                    return;
+                }
             }
+            var x = e.layerX - $me.width()/2;
+            var y = e.layerY - $me.height()/2;
             
+            // @todo This needs to not be set here, but rather in a socket from the server with the value from there
+            $me.css({
+                top: y,
+                left: x
+            });
         })
         
     },
@@ -151,6 +147,7 @@ var Game = {
                 left: player.x,
                 top: player.y
             });
+            $img.toggleClass('me', player.isSelf);
         });
     },
     
