@@ -152,6 +152,7 @@ var Game = {
                 top: player.y
             });
             $img.toggleClass('me', player.isSelf);
+            $img.toggleClass('it', player.isIt);
         });
     },
     

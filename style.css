@@ -66,9 +66,35 @@ h1 {
 	-moz-user-drag: none;
 	user-drag: none;
 	pointer-events: none;
+	
+	border: solid 1px rgba(0,0,0,0.25);
+	-moz-border-radius: 50px;
+	border-radius: 50px;
 }
-.field img.me {
+.field .me {
 	z-index: 1000;
+	-webkit-animation-name: me-border-animation;
+	-webkit-animation-duration: 0.5s;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-timing-function: linear;
+	-moz-animation-name: me-border-animation;
+	-moz-animation-duration: 0.5s;
+	-moz-animation-iteration-count: infinite;
+	-moz-animation-timing-function: linear;
+}
+.field .it {
+	background: rgba(255,0,0, 0.3);
+}
+
+@-webkit-keyframes me-border-animation {
+	0%   { border-color: rgba(0,0,0,0.25); }
+	50%  { border-color: rgba(0,0,0,1.0); }
+	100% { border-color: rgba(0,0,0,0.25); }
+}
+@-moz-keyframes border-animation {
+	0%   { border-color: rgba(0,0,0,0.25); }
+	50%  { border-color: rgba(0,0,0,1.0); }
+	100% { border-color: rgba(0,0,0,0.25); }
 }
 
 footer {

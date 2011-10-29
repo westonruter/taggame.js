@@ -60,6 +60,10 @@ var PlayerRegistry = _.extend([], {
         var position = _(sessionIds).indexOf(sessionId);
         if(position >= 0){
             this.splice(position, 1);
+            // Ensure that someone is always it, here the last person to join becomes it
+            if(player.isIt && this.length > 0){
+                this[this.length-1].isIt = true;
+            }
             return true;
         }
         else {
@@ -174,6 +178,11 @@ io.sockets.on('connection', function (socket) {
             player.x = parseInt(coordinates.x, 10);
             player.y = parseInt(coordinates.y, 10);
             io.sockets.emit('playerMoved', player.cloneForClient());
+            
+            // @todo Detect if the player who is "it" is touching another player
+            // otherPlayer.isIt = false;
+            // player.isIt = true;
+            // broadcastPlayersUpdate();
         }
     });
     
