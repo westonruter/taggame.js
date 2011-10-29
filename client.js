@@ -98,7 +98,10 @@ var Game = {
         });
         
         this.socket.on('playerLeave', function(player){
-            
+            if(that.playerElements[player.id]){
+                $(that.playerElements[player.id]).remove();
+                delete that.playerElements[player.id];
+            }
         });
         this.socket.on('playerJoin', function(player){
             
