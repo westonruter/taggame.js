@@ -146,7 +146,7 @@ function handler (req, res) {
  * Game events
  */
 io.sockets.on('connection', function (socket) {
-    io.sockets.emit('playersUpdate', PlayerRegistry.cloneAllForClient(socket));
+    broadcastPlayersUpdate();
     
     socket.on('playerJoinRequest', function (params) {
         if(typeof params.name === 'undefined'){
@@ -168,22 +168,22 @@ io.sockets.on('connection', function (socket) {
         }
     });
     
-    socket.on('playerMove', function(){
+    socket.on('playerMove', function(coordinates){
         var player = PlayerRegistry.getBy('sessionId', socket.id);
-        if(!player){
-           return;
+        if(player){
+            player.x = parseInt(coordinates.x, 10);
+            player.y = parseInt(coordinates.y, 10);
+            io.sockets.emit('playerMoved', player.cloneForClient());
         }
-        // @todo
     });
     
     socket.on('disconnect', function(){
         var player = PlayerRegistry.getBy('sessionId', socket.id);
-        if(!player){
-           return;
+        if(player){
+            PlayerRegistry.remove(player);
+            io.sockets.emit('playerLeave', player.cloneForClient());
+            broadcastPlayersUpdate();
         }
-        PlayerRegistry.remove(player);
-        io.sockets.emit('playerLeave', player.cloneForClient());
-        broadcastPlayersUpdate();
     });
 });
 

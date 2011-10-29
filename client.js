@@ -106,23 +106,27 @@ var Game = {
         });
         
         var $field = $('.field');
-        var $me;
         $field.mousemove(function(e){
-            if(!$me || !$me.length){
-                $me = $field.find('.me');
-                if($me.length == 0){
-                    return;
-                }
-            }
-            var x = e.layerX - $me.width()/2;
-            var y = e.layerY - $me.height()/2;
-            
             // @todo This needs to not be set here, but rather in a socket from the server with the value from there
-            $me.css({
-                top: y,
-                left: x
+            //$me.css({
+            //    top: y,
+            //    left: x
+            //});
+            that.socket.emit('playerMove', {
+                x: e.layerX,
+                y: e.layerY
             });
-        })
+        });
+        
+        this.socket.on('playerMoved', function(player){
+            var $img = $('#' + player.id);
+            if($img.length){
+                $img.css({
+                    left: player.x - $img.width()/2,
+                    top:  player.y - $img.height()/2
+                });
+            }
+        });
         
     },
     
