@@ -7,7 +7,6 @@ var Game = {
     socket: null,
     players: [],
     playerElements: {},
-    myPlayerId: null,
     
     init: function(){
         this.setupConnection();
@@ -22,6 +21,10 @@ var Game = {
     setupConnection: function(){
         var socket = this.socket = io.connect('//' + window.location.host);
         var that = this;
+        
+        socket.on('disconnect', function(){
+            $('.field').replaceWith('<p>You have been disconnected from the server or the server has crashed. Please reload.</p>');
+        });
     },
     
     setupJoinForm: function(){
@@ -105,6 +108,13 @@ var Game = {
             
         });
         
+        this.socket.on('playerUntaggable', function(player){
+            $(that.playerElements[player.id]).addClass('untaggable');
+        });
+        this.socket.on('playerTaggable', function(player){
+            $(that.playerElements[player.id]).removeClass('untaggable');
+        });
+        
         var $field = $('.field');
         $field.mousemove(function(e){
             // @todo This needs to not be set here, but rather in a socket from the server with the value from there
@@ -112,45 +122,51 @@ var Game = {
             //    top: y,
             //    left: x
             //});
-            that.socket.emit('playerMove', {
+            var coordinates = {
                 x: e.layerX,
                 y: e.layerY
-            });
+            };
+            that.socket.emit('playerMove', coordinates);
         });
         
         this.socket.on('playerMoved', function(player){
-            var $img = $('#' + player.id);
-            if($img.length){
-                $img.css({
-                    left: player.x - $img.width()/2,
-                    top:  player.y - $img.height()/2
-                });
-            }
+            that.setPlayerPosition(player);
         });
         
+    },
+    
+    getPlayerImage: function(player){
+        var $img;
+        if(!this.playerElements[player.id]){
+            $img = $('<img/>', {
+                id: player.id,
+                src: this.getRobohashURL(player.name, Math.min(player.width, player.height)),
+                width: player.width,
+                height: player.height
+            });
+            $('.field').append($img);
+            this.playerElements[player.id] = $img;
+        }
+        else {
+            $img = $(this.playerElements[player.id]);
+        }
+        return $img;
+    },
+    
+    setPlayerPosition: function(player){
+        var $img = this.getPlayerImage(player);
+        $img.css({
+            left: player.x - $img.width()/2,
+            top: player.y - $img.height()/2
+        });
+        return $img;
     },
     
     renderPlayers: function(){
         var that = this;
         _(this.players).each(function(player){
-            var $img;
-            if(!that.playerElements[player.id]){
-                $img = $('<img/>', {
-                    id: player.id,
-                    src: that.getRobohashURL(player.name, Math.min(player.width, player.height)),
-                    width: player.width,
-                    height: player.height
-                });
-                $('.field').append($img);
-                that.playerElements[player.id] = $img;
-            }
-            else {
-                $img = $(that.playerElements[player.id]);
-            }
-            $img.css({
-                left: player.x,
-                top: player.y
-            });
+            var $img = that.getPlayerImage(player);
+            that.setPlayerPosition(player);
             $img.toggleClass('me', player.isSelf);
             $img.toggleClass('it', player.isIt);
         });
