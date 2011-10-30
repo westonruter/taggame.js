@@ -165,7 +165,10 @@ function handler (req, res) {
  * Game events
  */
 io.sockets.on('connection', function (socket) {
-    broadcastPlayersUpdate();
+    
+    socket.on('requestPlayersUpdate', function(){
+        socket.emit('playersUpdate', PlayerRegistry.cloneAllForClient());
+    });
     
     socket.on('playerJoinRequest', function (params) {
         if(typeof params.name === 'undefined'){

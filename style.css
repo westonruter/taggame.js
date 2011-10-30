@@ -71,6 +71,13 @@ h1 {
 	-moz-border-radius: 50px;
 	border-radius: 50px;
 }
+/** @todo We'd really like to be able to do this!
+.field img::after {
+	content: attr(alt);
+	position: absolute;
+	bottom: -1em;
+}
+*/
 .field .me {
 	z-index: 1000;
 	-webkit-animation-name: me-border-animation;

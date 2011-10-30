@@ -10,8 +10,8 @@ var Game = {
     
     init: function(){
         this.setupConnection();
-        this.setupJoinForm();
         this.setupPlayerUpdates();
+        this.setupJoinForm();
         
         // Show UI
         $('.loading').remove();
@@ -115,13 +115,7 @@ var Game = {
             $(that.playerElements[player.id]).removeClass('untaggable');
         });
         
-        var $field = $('.field');
-        $field.mousemove(function(e){
-            // @todo This needs to not be set here, but rather in a socket from the server with the value from there
-            //$me.css({
-            //    top: y,
-            //    left: x
-            //});
+        $('.field').mousemove(function(e){
             var coordinates = {
                 x: e.layerX,
                 y: e.layerY
@@ -133,6 +127,7 @@ var Game = {
             that.setPlayerPosition(player);
         });
         
+        this.socket.emit('requestPlayersUpdate');
     },
     
     getPlayerImage: function(player){
@@ -142,7 +137,8 @@ var Game = {
                 id: player.id,
                 src: this.getRobohashURL(player.name, Math.min(player.width, player.height)),
                 width: player.width,
-                height: player.height
+                height: player.height,
+                alt: player.name
             });
             $('.field').append($img);
             this.playerElements[player.id] = $img;
