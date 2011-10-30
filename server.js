@@ -75,6 +75,8 @@ Player.prototype.cloneForClient = function(socket){
     return player;
 };
 
+var openSockets = {};
+
 var PlayerRegistry = _.extend([], {
     add: function(params){
         var player = new Player(params);
@@ -165,9 +167,10 @@ function handler (req, res) {
  * Game events
  */
 io.sockets.on('connection', function (socket) {
+    openSockets[socket.id] = socket;
     
     socket.on('requestPlayersUpdate', function(){
-        socket.emit('playersUpdate', PlayerRegistry.cloneAllForClient());
+        broadcastPlayersUpdate();
     });
     
     socket.on('playerJoinRequest', function (params) {
@@ -233,11 +236,12 @@ io.sockets.on('connection', function (socket) {
             io.sockets.emit('playerLeave', player.cloneForClient());
             broadcastPlayersUpdate();
         }
+        delete openSockets[socket.id];
     });
 });
 
 function broadcastPlayersUpdate(){
-    _(PlayerRegistry).each(function(player){
-        player.socket.emit('playersUpdate', PlayerRegistry.cloneAllForClient(player.socket));
+    _(openSockets).chain().values().each(function(socket){
+        socket.emit('playersUpdate', PlayerRegistry.cloneAllForClient(socket));
     });
 }
