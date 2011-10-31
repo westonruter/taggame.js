@@ -2,3 +2,9 @@ This is my first stab at a Node.js app.
 
 Tag! You're it!
 
+To play, simply run:
+$ node server.js
+
+And then load http://127.0.0.1:9001 in multiple browser tabs...
+
+to play with yourself :-P
